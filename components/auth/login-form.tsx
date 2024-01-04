@@ -15,6 +15,7 @@ import {
 } from '../ui/form';
 
 import { CardWrapper } from './card-wrapper';
+import { Input } from '../ui/input';
 
 export const LoginForm = () => {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -32,7 +33,47 @@ export const LoginForm = () => {
       backButtonHref="/auth/register"
       showSocial={true}
     >
-      LoginForm
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(() => {
+            console.log('Submit not implement');
+          })}
+          className="space-y-6"
+        >
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="example@domain.com"
+                      type="email"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </form>
+      </Form>
     </CardWrapper>
   );
 };
