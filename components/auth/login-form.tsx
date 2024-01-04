@@ -16,6 +16,7 @@ import {
 
 import { CardWrapper } from './card-wrapper';
 import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 
 export const LoginForm = () => {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -26,6 +27,10 @@ export const LoginForm = () => {
     },
   });
 
+  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    console.log(values);
+  };
+
   return (
     <CardWrapper
       headerLabel="Welcome Back"
@@ -34,12 +39,7 @@ export const LoginForm = () => {
       showSocial={true}
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(() => {
-            console.log('Submit not implement');
-          })}
-          className="space-y-6"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -72,6 +72,9 @@ export const LoginForm = () => {
               )}
             />
           </div>
+          <Button type="submit" className="w-full">
+            Login
+          </Button>
         </form>
       </Form>
     </CardWrapper>
