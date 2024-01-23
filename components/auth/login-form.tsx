@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+// New feature in React 18, substitute for useState handle pending
 import { useTransition } from 'react';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
