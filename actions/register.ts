@@ -1,0 +1,16 @@
+//makr as a server actions, equal feature to traditional API route
+'use server';
+import * as z from 'zod';
+
+import { RegisterSchema } from '@/schemas';
+
+export const register = async (values: z.infer<typeof RegisterSchema>) => {
+  //validation on server side
+  const validateFields = RegisterSchema.safeParse(values);
+
+  if (validateFields.success) {
+    return { success: 'Server validation success' };
+  }
+
+  return { error: 'Server validation failed' };
+};
