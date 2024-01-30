@@ -33,7 +33,7 @@ export const RegisterForm = () => {
     defaultValues: {
       email: '',
       password: '',
-      userName: '',
+      name: '',
     },
   });
 
@@ -61,7 +61,7 @@ export const RegisterForm = () => {
           <div className="space-y-4">
             <FormField
               control={form.control}
-              name="userName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>User Name</FormLabel>
