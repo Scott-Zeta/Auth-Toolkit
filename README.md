@@ -1,3 +1,18 @@
+## Edge Runtime
+
+### What is Edge Runtime?
+
+- Edge Runtime involves processing requests and responses on servers that are physically closer to the client's location, significantly reducing latency and improving performance.
+
+### Issues with Non-Edge Compatible Services (e.g., Prisma)
+
+- If a service like Prisma does not support Edge Runtime, all requests involving it (such as database queries) must be routed to a central server. This can increase latency and potentially lead to server overloads.
+
+### Advantage of JWT for Session Management
+
+- Using a database for session management means each session-related interaction involves a database query, which can be inefficient without Edge Runtime support.
+- JWT sessions optimize this by requiring database interaction only once during the initial login. Post-login, the JWT, which carries the session information, is validated locally, reducing the need for continuous database checks and leveraging the edge infrastructure.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
