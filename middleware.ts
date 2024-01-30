@@ -1,4 +1,7 @@
-import { auth } from './auth';
+import authConfig from './auth.config';
+import NextAuth from 'next-auth';
+
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   // Use the route and auth status to decide which is public or private route here
