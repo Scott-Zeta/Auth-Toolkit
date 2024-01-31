@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { LoginSchema } from '@/schemas';
 import { getUserByEmail } from './data/user';
 
@@ -14,6 +14,7 @@ export default {
           const { email, password } = validatedFields.data;
 
           const user = await getUserByEmail(email);
+          // User with Login Provider doesn't have password
           if (!user || !user.password) return null;
 
           const passwordsMatch = await bcrypt.compare(password, user.password);
