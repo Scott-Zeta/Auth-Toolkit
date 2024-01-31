@@ -12,6 +12,12 @@ export const {
 } = NextAuth({
   callbacks: {
     async session({ session, token }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
+      if (token.role && session.user) {
+        session.user.role = token.role;
+      }
       console.log({ token });
       console.log({ session });
       return session;
