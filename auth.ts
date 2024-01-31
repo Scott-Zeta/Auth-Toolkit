@@ -3,6 +3,19 @@ import authConfig from './auth.config';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { db } from './lib/db';
 import { getUserById } from './data/user';
+import { UserRole } from '@prisma/client';
+
+declare module 'next-auth' {
+  interface User {
+    role: UserRole;
+  }
+}
+
+declare module '@auth/core/adapters' {
+  interface AdapterUser {
+    role: UserRole;
+  }
+}
 
 export const {
   handlers: { GET, POST },
@@ -18,8 +31,8 @@ export const {
       if (token.role && session.user) {
         session.user.role = token.role;
       }
-      console.log({ token });
-      console.log({ session });
+      // console.log({ token });
+      // console.log({ session });
       return session;
     },
     async jwt({ token }) {
