@@ -8,7 +8,10 @@ import Google from 'next-auth/providers/google';
 
 export default {
   providers: [
-    GitHub,
+    GitHub({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
     Google,
     Credentials({
       async authorize(credentials) {
