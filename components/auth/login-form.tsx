@@ -23,6 +23,7 @@ import { Button } from '../ui/button';
 import { FormError } from '../form-error';
 import { FormSuccess } from '../form-success';
 import { login } from '@/actions/login';
+import Link from 'next/link';
 
 export const LoginForm = () => {
   const [ispending, startTransition] = useTransition();
@@ -93,6 +94,9 @@ export const LoginForm = () => {
                     <Input {...field} type="password" disabled={ispending} />
                   </FormControl>
                   <FormMessage />
+                  <Button size="sm" className="p-0 my-0" asChild variant="link">
+                    <Link href="/auth/reset">Forgot your password?</Link>
+                  </Button>
                 </FormItem>
               )}
             />
