@@ -10,7 +10,7 @@ export const publicRoutes = ['/', '/auth/new-verification'];
  * User will be redirected to DEFAULT_LOGIN_REDIRECT if they have already logged in
  * @type {string[]}
  */
-export const authRoutes = ['/auth/login', '/auth/register'];
+export const authRoutes = ['/auth/login', '/auth/register', '/auth/reset'];
 
 /**
  * The prefix for API authentication routes
