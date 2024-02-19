@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import email from 'next-auth/providers/email';
 
 export const getVerificationByEmail = async (email: string) => {
   try {
