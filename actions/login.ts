@@ -2,13 +2,19 @@
 'use server';
 import * as z from 'zod';
 
+import { db } from '@/lib/db';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { LoginSchema } from '@/schemas';
 import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
-import { generateVerificationToken } from '@/lib/tokens';
+import {
+  generateVerificationToken,
+  generateTwoFactorToken,
+} from '@/lib/tokens';
+import { getTwoFactorTokenByEmail } from '@/data/twoFactorToken';
+import { getTwoFactorConfirmationByUserId } from '@/data/twoFactorConfirmation';
 import { getUserByEmail } from '@/data/user';
-import { sendVerificationEmail } from '@/lib/mail';
+import { sendVerificationEmail, sendTwoFactorTokenEmail } from '@/lib/mail';
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   //validation on server side
@@ -18,7 +24,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     return { error: 'Server validation failed' };
   }
 
-  const { email, password } = validateFields.data;
+  const { email, password, code } = validateFields.data;
 
   const existingUser = await getUserByEmail(email);
   if (!existingUser || !existingUser.email) {
@@ -38,23 +44,66 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         'Email not verified, Please check your email box and verify the account!',
     };
   }
+  if (existingUser.isTwoFactorEnabled && existingUser.email) {
+    if (code) {
+      const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
 
-  try {
-    await signIn('credentials', {
-      email,
-      password,
-      redirectTo: DEFAULT_LOGIN_REDIRECT,
-    });
-    return { success: 'Logged in!' };
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return { error: 'Invalid credentials' };
-        default:
-          return { error: 'Unkown internal server error' };
+      if (!twoFactorToken) {
+        return { error: 'Invalid code!' };
       }
+
+      if (twoFactorToken.token !== code) {
+        return { error: 'Invalid code!' };
+      }
+
+      const hasExpired = new Date(twoFactorToken.expires) < new Date();
+
+      if (hasExpired) {
+        return { error: 'Code expired!' };
+      }
+
+      await db.twoFactorToken.delete({
+        where: { id: twoFactorToken.id },
+      });
+
+      const existingConfirmation = await getTwoFactorConfirmationByUserId(
+        existingUser.id
+      );
+
+      if (existingConfirmation) {
+        await db.twoFactorConfirmation.delete({
+          where: { id: existingConfirmation.id },
+        });
+      }
+
+      await db.twoFactorConfirmation.create({
+        data: {
+          userId: existingUser.id,
+        },
+      });
+    } else {
+      const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+      await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
+
+      return { twoFactor: true };
     }
-    throw error;
+    try {
+      await signIn('credentials', {
+        email,
+        password,
+        redirectTo: DEFAULT_LOGIN_REDIRECT,
+      });
+      return { success: 'Logged in!' };
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case 'CredentialsSignin':
+            return { error: 'Invalid credentials' };
+          default:
+            return { error: 'Unkown internal server error' };
+        }
+      }
+      throw error;
+    }
   }
 };
