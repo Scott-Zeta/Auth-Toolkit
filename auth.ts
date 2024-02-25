@@ -75,6 +75,9 @@ export const {
       if (!existingUser) return token;
 
       //assign role from db to token
+      //also for update if user changed their name and email
+      token.name = existingUser.name;
+      token.email = existingUser.email;
       token.role = existingUser.role;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
       return token;
