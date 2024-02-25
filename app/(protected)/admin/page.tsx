@@ -17,8 +17,17 @@ const AdminPage = () => {
         <p className="text-2xl font-semibold text-center">🔑 Admin</p>
       </CardHeader>
       <CardContent className="space-y-4">
+        <p className="text-sm font-medium">
+          This section is avaliable for both roles.
+        </p>
         <RoleGate allowedRole={[UserRole.ADMIN, UserRole.USER]}>
           <FormSuccess message="You are allowed to see this content!" />
+        </RoleGate>
+        <p className="text-sm font-medium">
+          This section is only avaliable for Admin.
+        </p>
+        <RoleGate allowedRole={[UserRole.ADMIN]}>
+          <FormSuccess message="Only admins are allowed to see this content!" />
         </RoleGate>
         <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-md">
           <p className="text-sm font-medium">Admin-only API Route</p>
