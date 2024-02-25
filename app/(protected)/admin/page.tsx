@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { UserRole } from '@prisma/client';
 import { toast } from 'sonner';
+import { admin } from '@/actions/admin';
 
 const AdminPage = () => {
   const onApiRouteClick = () => {
@@ -18,7 +19,17 @@ const AdminPage = () => {
     });
   };
 
-  const onServerActionClick = () => {};
+  const onServerActionClick = () => {
+    admin().then((data) => {
+      if (data.error) {
+        toast.error(data.error);
+      }
+
+      if (data.success) {
+        toast.success(data.success);
+      }
+    });
+  };
 
   return (
     <Card className="w-[600px]">
