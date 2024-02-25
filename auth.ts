@@ -5,11 +5,13 @@ import { db } from './lib/db';
 import { getUserById } from './data/user';
 import { UserRole } from '@prisma/client';
 import { getTwoFactorConfirmationByUserId } from './data/twoFactorConfirmation';
+import { getAccountByUserId } from './data/account';
 
 declare module 'next-auth' {
   interface User {
     role: UserRole;
     isTwoFactorEnabled: boolean;
+    isOAuth: boolean;
   }
 }
 
@@ -17,6 +19,7 @@ declare module '@auth/core/adapters' {
   interface AdapterUser {
     role: UserRole;
     isTwoFactorEnabled: boolean;
+    isOAuth: boolean;
   }
 }
 
@@ -66,6 +69,13 @@ export const {
       if (token.isTwoFactorEnabled && session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
       }
+
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.isOAuth = token.isOAuth;
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -74,9 +84,14 @@ export const {
       const existingUser = await getUserById(token.sub);
       if (!existingUser) return token;
 
+      const existingAccount = await getAccountByUserId(existingUser.id);
       //assign role from db to token
+      //also for update if user changed their name and email
+      token.name = existingUser.name;
+      token.email = existingUser.email;
       token.role = existingUser.role;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+      token.isOAuth = !!existingAccount; // if account exists, it's oauth
       return token;
     },
   },
