@@ -9,12 +9,14 @@ import { getTwoFactorConfirmationByUserId } from './data/twoFactorConfirmation';
 declare module 'next-auth' {
   interface User {
     role: UserRole;
+    isTwoFactorEnabled: boolean;
   }
 }
 
 declare module '@auth/core/adapters' {
   interface AdapterUser {
     role: UserRole;
+    isTwoFactorEnabled: boolean;
   }
 }
 
@@ -61,8 +63,9 @@ export const {
       if (token.role && session.user) {
         session.user.role = token.role;
       }
-      // console.log({ token });
-      // console.log({ session });
+      if (token.isTwoFactorEnabled && session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
+      }
       return session;
     },
     async jwt({ token }) {
@@ -73,6 +76,7 @@ export const {
 
       //assign role from db to token
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
       return token;
     },
   },
